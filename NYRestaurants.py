@@ -22,9 +22,6 @@ def scrape_page(soup, restaurants):
         if ville is not None:
             v = ville.text
 
-        lien = restaurant_element.find('a', 'href')
-        # récuperer tous les liens de la page
-
         tel = restaurant_element.find('div', class_="phones phone primary")
         if tel is not None:
             x = tel.text
@@ -41,7 +38,6 @@ def scrape_page(soup, restaurants):
                 'tags': ', '.join(tags),# Suite des tags séparés par des virgules
                 'adresse': a,
                 'ville': v,
-                'lien': lien,
                 'phones phone primary': x
 
             }
@@ -71,21 +67,6 @@ scrape_page(soup, restaurants)
 # getting the "Next →" HTML element
 next_li_element = soup.find('li', class_='next')
 
-# if there is a next page to scrape
-while next_li_element is not None:
-    next_page_relative_url = next_li_element.find('a', href=True)['href']
-
-    # getting the new page
-    page = requests.get(base_url + next_page_relative_url, headers=headers)
-
-    # parsing the new page
-    soup = BeautifulSoup(page.text, 'html.parser')
-
-    # scraping the new page
-    scrape_page(soup, restaurants)
-
-    # looking for the "Next →" HTML element in the new page
-    next_li_element = soup.find('li', class_='next')
 
 # création du fichier "NYRestaurants.csv"
 csv_file = open('NYRestaurants.csv', 'w', encoding='utf-8', newline='')
@@ -95,7 +76,7 @@ csv_file = open('NYRestaurants.csv', 'w', encoding='utf-8', newline='')
 writer = csv.writer(csv_file)
 
 # écriture de l'en-tête du fichier CSV
-writer.writerow(['Nom du restaurant', 'Tags', 'Adresse', 'Ville', 'Site', 'Numéro de tél'])
+writer.writerow(['Nom du restaurant', 'Tags', 'Adresse', 'Ville', 'Numéro de tél'])
 
 # écriture dans chaque ligne correspondant à un restaurant
 for restaurant in restaurants:
